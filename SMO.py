@@ -1,5 +1,24 @@
 import random
 
+def df_import(dataset):
+    # import data 
+    df = pd.read_csv(dataset, header = None)
+    # use random search 0.8
+    msk = np.random.rand(len(df)) < 0.8
+    # train
+    train = df[msk]
+    X_train = train.iloc[:,0:2].values
+    y_train = train.iloc[:,2:3].values
+    # test
+    test = df[~msk]
+    X_test = test.iloc[:,0:2].values
+    y_test = test.iloc[:,2:3].values
+    return X_train, y_train, X_test, y_test
+
+
+def svm():
+    return 0
+
 
 #####################################################################
 def formula_2(alfa, b, x, y): #NOT DONE
@@ -78,14 +97,17 @@ def SMO(c, tol, max_passes, x, y):
     while(passes < max_passes): #Ciclo While exterior
         num_changed_alfas = 0
         for i in range(1, x.size):
-            Ei = formula_2(alfa, b, x, y) # CALCULAR Ei -> FORMULA 2
+            # CALCULAR Ei -> FORMULA 2
+            fX = formula_2(alfa, b, x, y)
+            Ei = fX - y[i]
             if 1: #AQUELE IF ENORME
 
                 #SELECIONAR RANDOMLY
                 j = randomIndex(i, x)
 
                 #CALCULAR Ej -> FORMULA 2
-                Ej = formula_2(alfa, b, x, y)
+                fX = formula_2(alfa, b, x, y)
+                Ej = fX - y[j]
 
                 #GUARDAR ALFAS ANTIGOS
                 aI_old = alfa[i] 
