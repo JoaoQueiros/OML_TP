@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 def df_import(dataset):
     # import data 
@@ -21,10 +22,9 @@ def svm():
 
 
 #####################################################################
-def formula_2(alfa, b, x, y): #NOT DONE
+def formula_2(alfa, b, x, y):
 
-    for i in range(x.size):
-        res += alfa[i] *  + b
+    res = np.multiply(y, alfa).T * x * x[i].T + b - y[i]
 
     return res
 
@@ -79,8 +79,16 @@ def formula_18():
     return res
 
 #####################################################################
-def formula_19():
-    return res
+def formula_19(b1, b2, aI, aJ, c):
+
+    if 0 < aI < C:
+        b = b1
+    elif 0 < aJ < C:
+        b = b2
+    else:
+        b = (b1 / b2) / 2
+
+    return b
 
 def randomIndex(i, x):
     j = i
@@ -90,13 +98,16 @@ def randomIndex(i, x):
 
 
 def SMO(c, tol, max_passes, x, y):
-    alfa = []
+    m = len(x)
+    alpha = pd.DataFrame(0, index=np.arange(m), columns=['a']).values
+
     b = 0
     passes = 0
 
     while(passes < max_passes): #Ciclo While exterior
         num_changed_alfas = 0
-        for i in range(1, x.size):
+        for i in range(1, m):
+
             # CALCULAR Ei -> FORMULA 2
             fX = formula_2(alfa, b, x, y)
             Ei = fX - y[i]
@@ -146,7 +157,7 @@ def SMO(c, tol, max_passes, x, y):
                 b2 = formula_18()
 
                 #CALCULAR B -> FÓRMULA 19
-                b = formula_19()
+                b = formula_19(b1, b2, alfa[i], alfa[j], c)
 
                 num_changed_alfas += 1
 
