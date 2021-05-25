@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import pandas as pd
 
 def df_import(dataset):
     # import data 
@@ -14,33 +15,41 @@ def df_import(dataset):
     test = df[~msk]
     X_test = test.iloc[:,0:2].values
     y_test = test.iloc[:,2:3].values
-    return X_train, y_train, X_test, y_test
+
+    return np.mat(X_train), np.mat(y_train)#, np.mat(X_test), np.mat(y_test)
 
 
 def svm():
+    x, y = df_import('ex2data1.csv')
+    c = 1.2
+    tol = 1 * 10^-4
+    max_passes = 5
+
+    SMO(c, tol, max_passes, x, y)
+
     return 0
 
 
 #####################################################################
-def formula_2(alfa, b, x, y):
+def formula_2(alfa, b, x, y, i):
 
-    res = np.multiply(y, alfa).T * x * x[i].T + b - y[i]
+    res = np.multiply(y, alfa).T * x * x[i].T + b
 
     return res
 
 #####################################################################
-def formula_10(alfaI, alfaJ, C, yI, yJ):
+def formula_10(alfaI, alfaJ, C):
 
-    L = max(0, aI - aJ)
-    H = min(C, C + aJ - aI)
+    L = max(0, alfaI - alfaJ)
+    H = min(C, C + alfaJ - alfaI)
 
     return L, H
 
 #####################################################################
-def formula_11(alfaI, alfaJ, c, yI, yJ):
+def formula_11(alfaI, alfaJ, C):
 
-    L = max(0, aI + aJ - C)
-    H = min(C, aI + aJ)
+    L = max(0, alfaI + alfaJ - C)
+    H = min(C, alfaI + alfaJ)
 
     return L, H
 
@@ -52,7 +61,10 @@ def formula_12(aJ, Ei, Ej, N, yJ):
     return aJ
 
 #####################################################################
-def formula_14():
+def formula_14(x, i, j):
+
+    res = 2 * (x[j].T * x[i].T) - (x[i].T * x[i].T) - (x[j].T * x[j].T)
+
     return res
 
 #####################################################################
@@ -90,16 +102,16 @@ def formula_19(b1, b2, aI, aJ, c):
 
     return b
 
-def randomIndex(i, x):
+def randomIndex(i, m):
     j = i
     while(j == i):
-        j = int (random.uniform(0, x.size))
+        j = int (random.uniform(0, m))
     return j
 
 
 def SMO(c, tol, max_passes, x, y):
     m = len(x)
-    alpha = pd.DataFrame(0, index=np.arange(m), columns=['a']).values
+    alfa = pd.DataFrame(0, index=np.arange(m), columns=['a']).values
 
     b = 0
     passes = 0
@@ -109,15 +121,15 @@ def SMO(c, tol, max_passes, x, y):
         for i in range(1, m):
 
             # CALCULAR Ei -> FORMULA 2
-            fX = formula_2(alfa, b, x, y)
+            fX = formula_2(alfa, b, x, y, i)
             Ei = fX - y[i]
             if 1: #AQUELE IF ENORME
 
                 #SELECIONAR RANDOMLY
-                j = randomIndex(i, x)
+                j = randomIndex(i, m)
 
                 #CALCULAR Ej -> FORMULA 2
-                fX = formula_2(alfa, b, x, y)
+                fX = formula_2(alfa, b, x, y, j)
                 Ej = fX - y[j]
 
                 #GUARDAR ALFAS ANTIGOS
@@ -126,15 +138,15 @@ def SMO(c, tol, max_passes, x, y):
 
                 #CALCULAR L E H -> FORMULA 10 OU 11
                 if y[i] != y[j]: 
-                    L, H = formula_10(alfa[i], alfa[j], C, y[i], y[j]) 
+                    L, H = formula_10(alfa[i], alfa[j], c) 
                 else:
-                    L, H = formula_11(alfa[i], alfa[j], c, y[i], y[j])
+                    L, H = formula_11(alfa[i], alfa[j], c)
                 
                 #PASSAR PARA A PRÓXIMA ITERAÇÃO
                 if(L == H): continue
                 
                 #CALCULAR N -> FORMULA 14
-                N = formula_14(alfa[j], H, L)
+                N = formula_14(x, i, j)
 
                 #PASSAR PARA A PRÓXIMA ITERAÇÃO
                 if(N > 0): continue
@@ -167,3 +179,7 @@ def SMO(c, tol, max_passes, x, y):
             passses = 0
 
     return alfa, b
+
+
+
+svm()
