@@ -29,7 +29,7 @@ def formula_2(alfa, b, x, y):
     return res
 
 #####################################################################
-def formula_10(alfaI, alfaJ, C, yI, yJ):   #APLICAR SÓ SE yI != yJ:
+def formula_10(alfaI, alfaJ, C, yI, yJ):
 
     L = max(0, aI - aJ)
     H = min(C, C + aJ - aI)
@@ -37,7 +37,7 @@ def formula_10(alfaI, alfaJ, C, yI, yJ):   #APLICAR SÓ SE yI != yJ:
     return L, H
 
 #####################################################################
-def formula_11(alfaI, alfaJ, c, yI, yJ):    #APLICAR SÓ SE yI == yJ:
+def formula_11(alfaI, alfaJ, c, yI, yJ):
 
     L = max(0, aI + aJ - C)
     H = min(C, aI + aJ)
