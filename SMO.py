@@ -40,7 +40,7 @@ def formula_2(alfa, b, x, y, i):
 #####################################################################
 def formula_10(alfaI, alfaJ, C):
 
-    L = max(0, alfaI - alfaJ)
+    L = max(0, alfaJ - alfaI)
     H = min(C, C + alfaJ - alfaI)
 
     return L, H
