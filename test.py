@@ -20,16 +20,20 @@ def df_import(dataset):
 
     return np.mat(X_train), np.mat(y_train), np.mat(X_test), np.mat(y_test)
 
+def formula_14(x, i, j):
+
+    res = 2 * (x[j] * x[i].T) - (x[i] * x[i].T) - (x[j] * x[j].T)
+    #res = (x[i] * x[i].T)
+    return res
+
+
 X_train, y_train, X_test, y_test = df_import("ex2data1.csv")
 m = len(X_train)
 alpha = pd.DataFrame(0, index=np.arange(m), columns=['a']).values
 b = 0
 alpha = np.mat(alpha)
-def formula_2(alfa, b, x, y):
-
-    res = np.multiply(y, alfa).T * x * x[1].T + b - y[1]
-
-    return res
-
-res = formula_2(alpha, b, X_train, y_train)
+#res = formula_2(alpha, b, X_train, y_train)
+i = 1
+j = 2
+res = formula_14(X_train, i, j)
 print(res)

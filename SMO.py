@@ -33,7 +33,7 @@ def svm():
 #####################################################################
 def formula_2(alfa, b, x, y, i):
 
-    res = np.multiply(y, alfa).T * x * x[i].T + b
+    res = np.multiply(y, alfa).T * (x * x[i].T) + b
 
     return res
 
@@ -63,7 +63,7 @@ def formula_12(aJ, Ei, Ej, N, yJ):
 #####################################################################
 def formula_14(x, i, j):
 
-    res = 2 * (x[j].T * x[i].T) - (x[i].T * x[i].T) - (x[j].T * x[j].T)
+    res = 2 * (x[j] * x[i].T) - (x[i] * x[i].T) - (x[j] * x[j].T)
 
     return res
 
@@ -79,19 +79,28 @@ def formula_15(aJ, H, L):
     return res
 
 #####################################################################
-def formula_16():
+def formula_16(alfaI, alfaJ, alfaJ_old, yI, yJ):
+
+    res = alfaI + yI * yJ * (alfaJ_old - alfaJ)
+
     return res
 
 #####################################################################
-def formula_17():
+def formula_17(b, Ei, alfa, x, y, aI_old, aJ_old, i, j):
+
+    res = b - Ei - y[i] * (alfa[i] - aI_old) * (x[i] * x[i].T) - y[j] * (alfa[j] - aJ_old) * (x[j] * x[i].T)
+
     return res
 
 #####################################################################
-def formula_18():
+def formula_18(b, Ej, alfa, x, y, aI_old, aJ_old, i, j):
+
+    res = b - Ej - y[i] * (alfa[i] - aI_old) * (x[j] * x[i].T) - y[j] * (alfa[j] - aJ_old) * (x[j] * x[j].T)
+
     return res
 
 #####################################################################
-def formula_19(b1, b2, aI, aJ, c):
+def formula_19(b1, b2, aI, aJ, C):
 
     if 0 < aI < C:
         b = b1
@@ -160,18 +169,19 @@ def SMO(c, tol, max_passes, x, y):
                     continue
 
                 #CALCULAR Ai -> FÓRMULA 16
-                alfa[i] = formula_16()
+                alfa[i] = formula_16(alfa[i], alfa[j], aJ_old, y[i], y[j])
 
                 #CALCULAR B1 -> FÓRMULA 17
-                b1 = formula_17()
+                b1 = formula_17(b, Ei, alfa, x, y, aI_old, aJ_old, i, j)
 
                 #CALCULAR B2 -> FÓRMULA 18
-                b2 = formula_18()
+                b2 = formula_18(b, Ej, alfa, x, y, aI_old, aJ_old, i, j)
 
                 #CALCULAR B -> FÓRMULA 19
                 b = formula_19(b1, b2, alfa[i], alfa[j], c)
 
                 num_changed_alfas += 1
+                print(passes)
 
         if num_changed_alfas == 0:
             passes += 1
