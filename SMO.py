@@ -20,7 +20,7 @@ def df_import(dataset):
 
 
 def svm():
-    x, y = df_import('ex2data1.csv')
+    x, y = df_import('ex2data2.csv')
     c = 1.2
     tol = 1 * 10^-4
     max_passes = 5
@@ -56,9 +56,9 @@ def formula_11(alfaI, alfaJ, C):
 #####################################################################
 def formula_12(aJ, Ei, Ej, N, yJ):
 
-    aJ = aJ - ((yJ * ( Ei - Ej)) / N)
+    res = aJ - ((yJ * ( Ei - Ej)) / N)
     
-    return aJ
+    return res
 
 #####################################################################
 def formula_14(x, i, j):
@@ -181,7 +181,6 @@ def SMO(c, tol, max_passes, x, y):
                 b = formula_19(b1, b2, alfa[i], alfa[j], c)
 
                 num_changed_alfas += 1
-                print(passes)
 
         if num_changed_alfas == 0:
             passes += 1
