@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as pyplot
 
 def df_import(dataset):
     # import data 
@@ -16,16 +17,116 @@ def df_import(dataset):
     X_test = test.iloc[:,0:2].values
     y_test = test.iloc[:,2:3].values
 
-    return np.mat(X_train), np.mat(y_train)#, np.mat(X_test), np.mat(y_test)
+    return np.mat(X_train), np.mat(y_train), np.mat(X_test), np.mat(y_test)
+
+def calc_b(idx, alfas_idx, y_idx, x_idx):
+
+    b = 0
+    z= 0
+    l = len(idx)
+    for i in range(l):
+        aux = 0
+        for n in range(l):
+            aux += y_idx[n] * alfas_idx[n] * x_idx[n].T * x_idx[i]
+        b += y_idx[i] - aux
+
+    b = b / l
+    return b
+
+def calc_accuracy(y, predictions):
+
+    right = 0
+    samples = len(y)
+
+    for i in range(samples):
+        if y[i] == predictions[i]:
+            right += 1
+    
+    return right / samples
+
+def plot(x, y):
+
+    x0 = []; x1 = []; y0 = []; y1 = []
+
+    for i in range(len(y)):
+        if y[i] == 1:
+            x1.append(x[i,0])
+            y1.append(x[i,1])
+        else:
+            x0.append(x[i,0])
+            y0.append(x[i,1])
+
+    plot = pyplot.figure()
+    pyplot.xlabel(x[:,0])
+    pyplot.ylabel(x[:,1])
+    ax=plot.add_subplot(1,1,1)
+    print(x)
+    print(y)
+    ax.scatter(x0, y0, marker='o', s=30, c='orange')
+    ax.scatter(x1, y1, marker='o', s=30, c='green')
+
+    #x_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
+    #y_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
+
+    ax.plot(x,y)
+    ax.axis([0,max(x[:,0]) +0.2,0,max(x[:,1]) +0.2])
+    pyplot.show()
+
 
 
 def svm():
-    x, y = df_import('ex2data2.csv')
-    c = 1.2
+    x, y, x_test, y_test = df_import('ex1data1.csv')
+    #x, y = df_import('ex1data2.csv')
+    c = 10
     tol = 1 * 10^-4
-    max_passes = 5
+    max_passes = 2
 
-    SMO(c, tol, max_passes, x, y)
+    alfas = SMO(c, tol, max_passes, x, y).T
+
+    #x_alfa
+    #y_alfa
+
+    idx = []
+    alfas_idx = []
+    x_idx = []
+    y_idx = []
+
+
+    for i in range(len(alfas[0])):
+        if alfas[0][i] > 0:
+            idx.append(i)
+            alfas_idx.append(alfas[0][i])
+            y_idx.append(int(y[i][0]))
+            x_idx.append(x[i])
+
+    #print('Índices:', idx)
+    #print('Alfas:', alfas_idx)
+    #print('y:', y_idx)
+    #print('x:' , x_idx)
+
+    print('Indice:               Alfa:               X:                    Y:')
+    for i in range(len(alfas_idx)):
+        print(idx[i],'                   ', alfas_idx[i], '                 ', x_idx[i][0,0], x_idx[i][0,1], '    ', y_idx[i])
+
+
+    b = calc_b(idx, alfas_idx, y_idx, x_idx)
+
+    size = len(x_test)
+    reshape_size = len(x_idx)
+    predictions = []
+    for i in range(size):
+        res = np.multiply(y_idx, alfas_idx).T * (x_idx * x_test[i].T).reshape(reshape_size, 1)
+        if res > 0:
+            predictions.append(1)
+        else:
+            predictions.append(-1)
+
+    accuracy = calc_accuracy(y_test, predictions)
+
+    print()
+    print('Accuracy:', accuracy)
+
+    plot(x_test,y_test)
 
     return 0
 
@@ -124,15 +225,18 @@ def SMO(c, tol, max_passes, x, y):
 
     b = 0
     passes = 0
+    max_it = 5
+    it = 0
 
-    while(passes < max_passes): #Ciclo While exterior
+    while(passes < max_passes and it < max_it): #Ciclo While exterior
         num_changed_alfas = 0
+        it += 1
         for i in range(1, m):
 
             # CALCULAR Ei -> FORMULA 2
             fX = formula_2(alfa, b, x, y, i)
             Ei = fX - y[i]
-            if 1: #AQUELE IF ENORME
+            if (y[i] * Ei < -tol and alfa[i] < c) or (y[i] * Ei > tol and alfa[i] > 0):
 
                 #SELECIONAR RANDOMLY
                 j = randomIndex(i, m)
@@ -182,13 +286,13 @@ def SMO(c, tol, max_passes, x, y):
 
                 num_changed_alfas += 1
 
+        #print(num_changed_alfas)
         if num_changed_alfas == 0:
             passes += 1
         else:
             passses = 0
 
-    return alfa, b
-
+    return alfa
 
 
 svm()
