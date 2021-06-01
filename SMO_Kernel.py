@@ -2,6 +2,7 @@ import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as pyplot
+import math
 
 def df_import(dataset):
     # import data 
@@ -27,7 +28,7 @@ def calc_b(idx, alfas_idx, y_idx, x_idx):
     for i in range(l):
         aux = 0
         for n in range(l):
-            aux += y_idx[n] * alfas_idx[n] * x_idx[n].T * x_idx[i]
+            aux += y_idx[n] * alfas_idx[n] * K(x_idx[i], x_idx[n])
         b += y_idx[i] - aux
 
     b = b / l
@@ -44,10 +45,10 @@ def calc_accuracy(y, predictions):
     
     return right / samples
 
-def plot(x, y):
+def plot(x, y, xT, yT, b, alfas):
 
     x0 = []; x1 = []; y0 = []; y1 = []
-
+    xS0 = []; xS1 = []; yS0 = []; yS1 = []
 
 
 
@@ -59,17 +60,28 @@ def plot(x, y):
             x0.append(x[i,0])
             y0.append(x[i,1])
 
+    for i in range(len(yT)):
+        if yT[i] == 1:
+            xS1.append(xT[i,0])
+            yS1.append(xT[i,1])
+        else:
+            xS0.append(xT[i,0])
+            yS0.append(xT[i,1])
+
+    
+
     plot = pyplot.figure()
     ax=plot.add_axes([0,0,1,1])
     ax=plot.add_subplot(1,1,1)
-    ax.scatter(x0, y0, marker='o', s=30, c='orange')
-    ax.scatter(x1, y1, marker='o', s=30, c='green')
+    ax.scatter(x0, y0, marker='o', s=20, c='orange')
+    ax.scatter(x1, y1, marker='o', s=20, c='green')
+    ax.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
+    ax.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
     pyplot.xlabel('x1')
     pyplot.ylabel('x2')
 
-    #x_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
-    #y_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
-
+    x_axis = np.arange(0.0,10.0,0.1)
+    y_axis = b #* x_axis
     
     #ax.plot(x,y)
     ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
@@ -100,8 +112,10 @@ def svm():
             idx.append(i)
             alfas_idx.append(alfas[0][i])
             y_idx.append(int(y[i][0]))
-            x_idx.append(x[i])
+            x_idx.append([x[i, 0], x[i, 1]])
 
+    x_idx = np.matrix(x_idx)
+    print(x_idx)
     #print('Índices:', idx)
     #print('Alfas:', alfas_idx)
     #print('y:', y_idx)
@@ -109,7 +123,7 @@ def svm():
 
     print('Indice:               Alfa:               X:                    Y:')
     for i in range(len(alfas_idx)):
-        print(idx[i],'                   ', alfas_idx[i], '                 ', x_idx[i][0,0], x_idx[i][0,1], '    ', y_idx[i])
+        print(idx[i],'                   ', alfas_idx[i], '                 ', x_idx[i, 0], x_idx[i, 1], '    ', y_idx[i])
 
 
     b = calc_b(idx, alfas_idx, y_idx, x_idx)
@@ -118,7 +132,8 @@ def svm():
     reshape_size = len(x_idx)
     predictions = []
     for i in range(size):
-        res = np.multiply(y_idx, alfas_idx).T * (x_idx * x_test[i].T).reshape(reshape_size, 1)
+        #print(x_idx,x_test[i])
+        res = np.multiply(y_idx, alfas_idx).T * K(x_idx, x_test[i])
         if res > 0:
             predictions.append(1)
         else:
@@ -129,18 +144,27 @@ def svm():
     print()
     print('Accuracy:', accuracy)
 
-    plot(x,y)
+    plot(x,y,x_idx,y_idx, b, alfas_idx)
 
     return 0
 
-#def K(X, x):
-#    return 0
+#####################################################################
+def K(X, x):
+    if k_function == 'l':
+        return X * x.T
+    if k_function == 'g':
+        res = []
+        for i in range(len(X[:,0])):
+            res.append(math.exp(-gm * np.linalg.norm(X[i] - x)))
+        return np.matrix(res).T
+    if k_function == 'p':
+        return np.power(X * x.T, 3)
 
 
 #####################################################################
 def formula_2(alfa, b, x, y, i):
 
-    res = np.multiply(y, alfa).T * (x * x[i].T) + b
+    res = np.multiply(y, alfa).T * K(x,x[i]) + b
 
     return res
 
@@ -170,7 +194,7 @@ def formula_12(aJ, Ei, Ej, N, yJ):
 #####################################################################
 def formula_14(x, i, j):
 
-    res = 2 * (x[j] * x[i].T) - (x[i] * x[i].T) - (x[j] * x[j].T)
+    res = 2 * K(x[j], x[i]) - K(x[i], x[i]) - K(x[j], x[j])
 
     return res
 
@@ -195,14 +219,14 @@ def formula_16(alfaI, alfaJ, alfaJ_old, yI, yJ):
 #####################################################################
 def formula_17(b, Ei, alfa, x, y, aI_old, aJ_old, i, j):
 
-    res = b - Ei - y[i] * (alfa[i] - aI_old) * (x[i] * x[i].T) - y[j] * (alfa[j] - aJ_old) * (x[j] * x[i].T)
+    res = b - Ei - y[i] * (alfa[i] - aI_old) * K(x[i], x[i]) - y[j] * (alfa[j] - aJ_old) * K(x[j], x[i])
 
     return res
 
 #####################################################################
 def formula_18(b, Ej, alfa, x, y, aI_old, aJ_old, i, j):
 
-    res = b - Ej - y[i] * (alfa[i] - aI_old) * (x[j] * x[i].T) - y[j] * (alfa[j] - aJ_old) * (x[j] * x[j].T)
+    res = b - Ej - y[i] * (alfa[i] - aI_old) * K(x[j], x[i]) - y[j] * (alfa[j] - aJ_old) * K(x[j], x[j])
 
     return res
 
@@ -300,6 +324,7 @@ def SMO(c, tol, max_passes, x, y):
 
     return alfa
 
-sigma=1
-gm = 1/(2*sigma^2)
+k_function = 'l'
+#sigma=1
+gm = 1/2
 svm()
