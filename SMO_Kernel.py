@@ -20,6 +20,7 @@ def df_import(dataset):
 
     return np.mat(X_train), np.mat(y_train), np.mat(X_test), np.mat(y_test)
 
+#####################################################################
 def calc_b(idx, alfas_idx, y_idx, x_idx):
 
     b = 0
@@ -34,6 +35,7 @@ def calc_b(idx, alfas_idx, y_idx, x_idx):
     b = b / l
     return b
 
+#####################################################################
 def calc_accuracy(y, predictions):
 
     right = 0
@@ -45,6 +47,7 @@ def calc_accuracy(y, predictions):
     
     return right / samples
 
+#####################################################################
 def plot(x, y, xT, yT, b, alfas):
 
     x0 = []; x1 = []; y0 = []; y1 = []
@@ -80,10 +83,11 @@ def plot(x, y, xT, yT, b, alfas):
     pyplot.xlabel('x1')
     pyplot.ylabel('x2')
 
-    x_axis = np.arange(0.0,10.0,0.1)
-    y_axis = b #* x_axis
+
+    #x_axis = np.linspace(-5,5,100)
+    #y_axis = 2 * x + 1 #* x_axis
     
-    #ax.plot(x,y)
+    #ax.plot(x_axis,y_axis)
     ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
     pyplot.show()
 
@@ -97,9 +101,6 @@ def svm():
     max_passes = 2
 
     alfas = SMO(c, tol, max_passes, x, y).T
-
-    #x_alfa
-    #y_alfa
 
     idx = []
     alfas_idx = []
@@ -115,11 +116,6 @@ def svm():
             x_idx.append([x[i, 0], x[i, 1]])
 
     x_idx = np.matrix(x_idx)
-    print(x_idx)
-    #print('Índices:', idx)
-    #print('Alfas:', alfas_idx)
-    #print('y:', y_idx)
-    #print('x:' , x_idx)
 
     print('Indice:               Alfa:               X:                    Y:')
     for i in range(len(alfas_idx)):
@@ -132,7 +128,6 @@ def svm():
     reshape_size = len(x_idx)
     predictions = []
     for i in range(size):
-        #print(x_idx,x_test[i])
         res = np.multiply(y_idx, alfas_idx).T * K(x_idx, x_test[i])
         if res > 0:
             predictions.append(1)
