@@ -44,10 +44,10 @@ def calc_accuracy(y, predictions):
     
     return right / samples
 
-def plot(x, y):
+def plot(x, y, xT, yT, b, alfas):
 
     x0 = []; x1 = []; y0 = []; y1 = []
-
+    xS0 = []; xS1 = []; yS0 = []; yS1 = []
 
 
 
@@ -59,19 +59,37 @@ def plot(x, y):
             x0.append(x[i,0])
             y0.append(x[i,1])
 
+    for i in range(len(yT)):
+        if yT[i] == 1:
+            xS1.append(xT[i,0])
+            yS1.append(xT[i,1])
+        else:
+            xS0.append(xT[i,0])
+            yS0.append(xT[i,1])
+
+    
+
     plot = pyplot.figure()
     ax=plot.add_axes([0,0,1,1])
     ax=plot.add_subplot(1,1,1)
-    ax.scatter(x0, y0, marker='o', s=30, c='orange')
-    ax.scatter(x1, y1, marker='o', s=30, c='green')
+    ax.scatter(x0, y0, marker='o', s=20, c='orange')
+    ax.scatter(x1, y1, marker='o', s=20, c='green')
+    ax.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
+    ax.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
     pyplot.xlabel('x1')
     pyplot.ylabel('x2')
 
-    #x_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
-    #y_axis = np.arrange(min(x)-1, max(x)+1, 0.1)
+    x_axis = np.linspace(-100.,100.)
 
+    #fig,ax = plot.subplots()
+    #ax.plot(x_axis,np.multiply(y, alfas).T * K(x,x[i]) + b)
+
+    #ax.set_xlim((-100.,100.))
+    #ax.set_ylim((-100.,100.))
+
+    #y_axis = 2 * x + 1 #* x_axis
     
-    #ax.plot(x,y)
+    #ax.plot(x_axis,y_axis)
     ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
     pyplot.show()
 
@@ -129,7 +147,7 @@ def svm():
     print()
     print('Accuracy:', accuracy)
 
-    plot(x,y)
+    plot(x,y,x_idx,y_idx, b, alfas_idx)
 
     return 0
 
@@ -300,6 +318,6 @@ def SMO(c, tol, max_passes, x, y):
 
     return alfa
 
-sigma=1
-gm = 1/(2*sigma^2)
+#sigma=1
+gm = 1/2
 svm()

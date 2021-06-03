@@ -83,8 +83,14 @@ def plot(x, y, xT, yT, b, alfas):
     pyplot.xlabel('x1')
     pyplot.ylabel('x2')
 
+    x_axis = np.linspace(-100.,100.)
 
-    #x_axis = np.linspace(-5,5,100)
+    #fig,ax = plot.subplots()
+    #ax.plot(x_axis,np.multiply(y, alfas).T * K(x,x[i]) + b)
+
+    #ax.set_xlim((-100.,100.))
+    #ax.set_ylim((-100.,100.))
+
     #y_axis = 2 * x + 1 #* x_axis
     
     #ax.plot(x_axis,y_axis)
@@ -94,8 +100,10 @@ def plot(x, y, xT, yT, b, alfas):
 
 
 def svm():
-    x, y, x_test, y_test = df_import('ex1data1.csv')
+    #x, y, x_test, y_test = df_import('ex1data1.csv')
     #x, y, x_test, y_test = df_import('ex1data2.csv')
+    x, y, x_test, y_test = df_import('ex2data1.csv')
+    #x, y, x_test, y_test = df_import('ex2data2.csv')
     c = 10
     tol = 1 * 10^-4
     max_passes = 2
@@ -319,7 +327,7 @@ def SMO(c, tol, max_passes, x, y):
 
     return alfa
 
-k_function = 'l'
+k_function = 'p'
 #sigma=1
 gm = 1/2
 svm()
