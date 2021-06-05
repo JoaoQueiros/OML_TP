@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-k_function = 'g'
+k_function = 'l'
 #sigma=1
 gm = 1/2
 
@@ -55,20 +55,20 @@ def calc_accuracy(y, predictions):
 #####################################################################
 def temp(b, alfas , yT, xT, grid):
 
-    size = len(grid[0])
-    #print(grid)
-    
-    Yp = []
-    for i in range(size):
-        Yp.append((np.multiply(yT,alfas).T * K(xT, [grid[0][i],grid[1][i]]) + b).item())
+    h = len(grid[0])
+    w = len(grid[0][0])
+    Yp = [[0 for x in range(w)] for y in range(h)]
+    print(h)
+    for i in range(h):
+        for j in range(w):
+            Yp[i][j] = np.sign((np.multiply(yT,alfas).T * K(xT, np.matrix([grid[0][i][j],grid[1][i][j]])) + b).item())
 
-    #print('Yp:',Yp)
     #np.multiply(y, alfa).T * K(x,x[i]) + b
 
     #print('size: ',size)
     #for i in range()
 
-    return 0
+    return Yp
 
 #####################################################################
 def plot(x, y, xT, yT, b, alfas):
@@ -98,11 +98,8 @@ def plot(x, y, xT, yT, b, alfas):
     minim = min(min(x[:,0]),min(x[:,1])) -0.2
     maxim = max(max(x[:,0]),max(x[:,1])) +0.2
 
-    x_axis = np.arange(-4,5, 1)
-    y_axis = np.arange(-5,6, 1)
-
-    #x_axis = np.arange(minim,maxim, 0.01)
-    #y_axis = np.arange(minim,maxim, 0.01)
+    x_axis = np.arange(minim,maxim, 0.05)
+    y_axis = np.arange(minim,maxim, 0.05)
     xx,yy = np.meshgrid(x_axis, y_axis)
     grid = [xx,yy]
 
@@ -111,8 +108,7 @@ def plot(x, y, xT, yT, b, alfas):
     #z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
     #z = np.multiply(yy, alfas).T * K(x,xx[i]) + b
     h = plt.contourf(xx,yy,Yp)
-    #plt.show()
-    '''
+    plt.show()
     plot = plt.figure()
     ax=plot.add_axes([0,0,1,1])
     ax=plot.add_subplot(1,1,1)
@@ -125,7 +121,7 @@ def plot(x, y, xT, yT, b, alfas):
 
 
     ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
-    plt.show()'''
+    plt.show()
 
 
 
