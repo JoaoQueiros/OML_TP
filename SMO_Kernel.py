@@ -1,8 +1,13 @@
 import random
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as pyplot
+import matplotlib.pyplot as plt
 import math
+
+
+k_function = 'g'
+#sigma=1
+gm = 1/2
 
 def df_import(dataset):
     # import data 
@@ -71,9 +76,19 @@ def plot(x, y, xT, yT, b, alfas):
             xS0.append(xT[i,0])
             yS0.append(xT[i,1])
 
-    
+    #pyplot.plot([1,2,3,4])
+    #pyplot.show()
 
-    plot = pyplot.figure()
+    x_axis = np.arange(min(x[:,0])-0.2,max(x[:,0]) +0.2, 0.01)
+    y_axis = np.arange(min(x[:,1])-0.2,max(x[:,1]) +0.2, 0.01)
+    xx, yy = np.meshgrid(x_axis, y_axis, sparse=True)
+    xGrid = [xx, yy]
+    Yp=formula_2(alfas, b, xT, yT, xGrid) #(w0,asv,ysv,Xsv,xGrid')
+    #z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
+    #z = np.multiply(yy, alfas).T * K(x,xx[i]) + b
+    #h = plt.contourf(x_axis,y_axis,z)
+    #plt.show()
+    '''
     ax=plot.add_axes([0,0,1,1])
     ax=plot.add_subplot(1,1,1)
     ax.scatter(x0, y0, marker='o', s=20, c='orange')
@@ -83,19 +98,9 @@ def plot(x, y, xT, yT, b, alfas):
     pyplot.xlabel('x1')
     pyplot.ylabel('x2')
 
-    x_axis = np.linspace(-100.,100.)
 
-    #fig,ax = plot.subplots()
-    #ax.plot(x_axis,np.multiply(y, alfas).T * K(x,x[i]) + b)
-
-    #ax.set_xlim((-100.,100.))
-    #ax.set_ylim((-100.,100.))
-
-    #y_axis = 2 * x + 1 #* x_axis
-    
-    #ax.plot(x_axis,y_axis)
-    ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
-    pyplot.show()
+    ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2]) '''
+    #pyplot.show()
 
 
 
@@ -327,7 +332,5 @@ def SMO(c, tol, max_passes, x, y):
 
     return alfa
 
-k_function = 'p'
-#sigma=1
-gm = 1/2
+
 svm()
