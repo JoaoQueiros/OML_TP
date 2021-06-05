@@ -53,12 +53,28 @@ def calc_accuracy(y, predictions):
     return right / samples
 
 #####################################################################
+def temp(b, alfas , yT, xT, grid):
+
+    size = len(grid[0])
+    #print(grid)
+    
+    Yp = []
+    for i in range(size):
+        Yp.append((np.multiply(yT,alfas).T * K(xT, [grid[0][i],grid[1][i]]) + b).item())
+
+    #print('Yp:',Yp)
+    #np.multiply(y, alfa).T * K(x,x[i]) + b
+
+    #print('size: ',size)
+    #for i in range()
+
+    return 0
+
+#####################################################################
 def plot(x, y, xT, yT, b, alfas):
 
     x0 = []; x1 = []; y0 = []; y1 = []
     xS0 = []; xS1 = []; yS0 = []; yS1 = []
-
-
 
     for i in range(len(y)):
         if y[i] == 1:
@@ -78,36 +94,45 @@ def plot(x, y, xT, yT, b, alfas):
 
     #pyplot.plot([1,2,3,4])
     #pyplot.show()
+    
+    minim = min(min(x[:,0]),min(x[:,1])) -0.2
+    maxim = max(max(x[:,0]),max(x[:,1])) +0.2
 
-    x_axis = np.arange(min(x[:,0])-0.2,max(x[:,0]) +0.2, 0.01)
-    y_axis = np.arange(min(x[:,1])-0.2,max(x[:,1]) +0.2, 0.01)
-    xx, yy = np.meshgrid(x_axis, y_axis, sparse=True)
-    xGrid = [xx, yy]
-    Yp=formula_2(alfas, b, xT, yT, xGrid) #(w0,asv,ysv,Xsv,xGrid')
+    x_axis = np.arange(-4,5, 1)
+    y_axis = np.arange(-5,6, 1)
+
+    #x_axis = np.arange(minim,maxim, 0.01)
+    #y_axis = np.arange(minim,maxim, 0.01)
+    xx,yy = np.meshgrid(x_axis, y_axis)
+    grid = [xx,yy]
+
+    #print(np.matrix(xGrid))
+    Yp= temp(b, alfas , yT, xT, grid) #(w0,asv,ysv,Xsv,xGrid')
     #z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
     #z = np.multiply(yy, alfas).T * K(x,xx[i]) + b
-    #h = plt.contourf(x_axis,y_axis,z)
+    h = plt.contourf(xx,yy,Yp)
     #plt.show()
     '''
+    plot = plt.figure()
     ax=plot.add_axes([0,0,1,1])
     ax=plot.add_subplot(1,1,1)
     ax.scatter(x0, y0, marker='o', s=20, c='orange')
     ax.scatter(x1, y1, marker='o', s=20, c='green')
     ax.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
     ax.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
-    pyplot.xlabel('x1')
-    pyplot.ylabel('x2')
+    plt.xlabel('x1')
+    plt.ylabel('x2')
 
 
-    ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2]) '''
-    #pyplot.show()
+    ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
+    plt.show()'''
 
 
 
 def svm():
-    #x, y, x_test, y_test = df_import('ex1data1.csv')
+    x, y, x_test, y_test = df_import('ex1data1.csv')
     #x, y, x_test, y_test = df_import('ex1data2.csv')
-    x, y, x_test, y_test = df_import('ex2data1.csv')
+    #x, y, x_test, y_test = df_import('ex2data1.csv')
     #x, y, x_test, y_test = df_import('ex2data2.csv')
     c = 10
     tol = 1 * 10^-4
