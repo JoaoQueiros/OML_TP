@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-k_function = 'l'
+k_function = 'p'
 #sigma=1
 gm = 1/2
 
@@ -53,29 +53,26 @@ def calc_accuracy(y, predictions):
     return right / samples
 
 #####################################################################
-def temp(b, alfas , yT, xT, grid):
+def calc_grid(b, alfas , yT, xT, grid):
 
     h = len(grid[0])
     w = len(grid[0][0])
     Yp = [[0 for x in range(w)] for y in range(h)]
-    print(h)
+
     for i in range(h):
         for j in range(w):
-            Yp[i][j] = np.sign((np.multiply(yT,alfas).T * K(xT, np.matrix([grid[0][i][j],grid[1][i][j]])) + b).item())
-
-    #np.multiply(y, alfa).T * K(x,x[i]) + b
-
-    #print('size: ',size)
-    #for i in range()
+            Yp[i][j] = int(np.sign((np.multiply(yT,alfas).T * K(xT, np.matrix([grid[0][i][j],grid[1][i][j]])) + b).item()))
 
     return Yp
 
 #####################################################################
-def plot(x, y, xT, yT, b, alfas):
+def plot(x, y, xT, yT, b, alfas, x_test, y_test):
 
     x0 = []; x1 = []; y0 = []; y1 = []
     xS0 = []; xS1 = []; yS0 = []; yS1 = []
+    xT0 = []; xT1 = []; yT0 = []; yT1 = []
 
+    #Scatter dos dados de treino
     for i in range(len(y)):
         if y[i] == 1:
             x1.append(x[i,0])
@@ -84,6 +81,7 @@ def plot(x, y, xT, yT, b, alfas):
             x0.append(x[i,0])
             y0.append(x[i,1])
 
+    #Scatter dos dados de suporte
     for i in range(len(yT)):
         if yT[i] == 1:
             xS1.append(xT[i,0])
@@ -92,44 +90,47 @@ def plot(x, y, xT, yT, b, alfas):
             xS0.append(xT[i,0])
             yS0.append(xT[i,1])
 
-    #pyplot.plot([1,2,3,4])
-    #pyplot.show()
-    
+    #Scatter dos dados de validação
+    for i in range(len(y_test)):
+        if y_test[i] == 1:
+            xT1.append(x_test[i,0])
+            yT1.append(x_test[i,1])
+        else:
+            xT0.append(x_test[i,0])
+            yT0.append(x_test[i,1])
+
     minim = min(min(x[:,0]),min(x[:,1])) -0.2
     maxim = max(max(x[:,0]),max(x[:,1])) +0.2
 
-    x_axis = np.arange(minim,maxim, 0.05)
-    y_axis = np.arange(minim,maxim, 0.05)
+    x_axis = np.arange(minim,maxim, 0.01)
+    y_axis = np.arange(minim,maxim, 0.01)
     xx,yy = np.meshgrid(x_axis, y_axis)
     grid = [xx,yy]
 
-    #print(np.matrix(xGrid))
-    Yp= temp(b, alfas , yT, xT, grid) #(w0,asv,ysv,Xsv,xGrid')
-    #z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
-    #z = np.multiply(yy, alfas).T * K(x,xx[i]) + b
-    h = plt.contourf(xx,yy,Yp)
-    plt.show()
-    plot = plt.figure()
-    ax=plot.add_axes([0,0,1,1])
-    ax=plot.add_subplot(1,1,1)
-    ax.scatter(x0, y0, marker='o', s=20, c='orange')
-    ax.scatter(x1, y1, marker='o', s=20, c='green')
-    ax.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
-    ax.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
+    Yp= calc_grid(b, alfas , yT, xT, grid)
+    plt.contour(xx,yy,Yp, levels = [0,10], colors='black')
+
+    plt.scatter(x0, y0, marker='o', s=20, c='orange')
+    plt.scatter(x1, y1, marker='o', s=20, c='green')
+    plt.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
+    plt.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
+    plt.scatter(xT0, yT0, marker='o',facecolors='none', edgecolors='orange', s=20)
+    plt.scatter(xT1, yT1, marker='o',facecolors='none', edgecolors='green', s=20)
     plt.xlabel('x1')
     plt.ylabel('x2')
 
 
-    ax.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
+    plt.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
     plt.show()
 
 
 
 def svm():
-    x, y, x_test, y_test = df_import('ex1data1.csv')
+    
+    #x, y, x_test, y_test = df_import('ex1data1.csv')
     #x, y, x_test, y_test = df_import('ex1data2.csv')
     #x, y, x_test, y_test = df_import('ex2data1.csv')
-    #x, y, x_test, y_test = df_import('ex2data2.csv')
+    x, y, x_test, y_test = df_import('ex2data2.csv')
     c = 10
     tol = 1 * 10^-4
     max_passes = 2
@@ -173,7 +174,7 @@ def svm():
     print()
     print('Accuracy:', accuracy)
 
-    plot(x,y,x_idx,y_idx, b, alfas_idx)
+    plot(x,y,x_idx,y_idx, b, alfas_idx, x_test, y_test)
 
     return 0
 
