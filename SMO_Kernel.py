@@ -4,8 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
+# l = linear
+# g = gaussiana
+# p = polinomial
+k_function = 'g'
 
-k_function = 'p'
 #sigma=1
 gm = 1/2
 
@@ -102,22 +105,23 @@ def plot(x, y, xT, yT, b, alfas, x_test, y_test):
     minim = min(min(x[:,0]),min(x[:,1])) -0.2
     maxim = max(max(x[:,0]),max(x[:,1])) +0.2
 
-    x_axis = np.arange(minim,maxim, 0.01)
-    y_axis = np.arange(minim,maxim, 0.01)
+    x_axis = np.arange(minim,maxim, 0.1)
+    y_axis = np.arange(minim,maxim, 0.1)
     xx,yy = np.meshgrid(x_axis, y_axis)
     grid = [xx,yy]
 
     Yp= calc_grid(b, alfas , yT, xT, grid)
     plt.contour(xx,yy,Yp, levels = [0,10], colors='black')
 
-    plt.scatter(x0, y0, marker='o', s=20, c='orange')
-    plt.scatter(x1, y1, marker='o', s=20, c='green')
-    plt.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80)
+    plt.scatter(x0, y0, marker='o', s=20, c='orange', label = 'Classe -1, Treino')
+    plt.scatter(xT0, yT0, marker='o',facecolors='none', edgecolors='orange', s=20, label = 'Classe -1, Validação')
+    plt.scatter(x1, y1, marker='o', s=20, c='green', label = 'Classe 1, Treino')
+    plt.scatter(xT1, yT1, marker='o',facecolors='none', edgecolors='green', s=20, label = 'Classe 1, Validação')
+    plt.scatter(xS0, yS0, marker='o',facecolors='none', edgecolors='blue', s=80, label='Alfa de Suporte')
     plt.scatter(xS1, yS1, marker='o',facecolors='none', edgecolors='blue', s=80)
-    plt.scatter(xT0, yT0, marker='o',facecolors='none', edgecolors='orange', s=20)
-    plt.scatter(xT1, yT1, marker='o',facecolors='none', edgecolors='green', s=20)
     plt.xlabel('x1')
     plt.ylabel('x2')
+    plt.legend()
 
 
     plt.axis([min(x[:,0])-0.2,max(x[:,0]) +0.2,min(x[:,1])-0.2,max(x[:,1]) +0.2])
@@ -127,10 +131,11 @@ def plot(x, y, xT, yT, b, alfas, x_test, y_test):
 
 def svm():
     
-    #x, y, x_test, y_test = df_import('ex1data1.csv')
-    #x, y, x_test, y_test = df_import('ex1data2.csv')
-    #x, y, x_test, y_test = df_import('ex2data1.csv')
-    x, y, x_test, y_test = df_import('ex2data2.csv')
+    #x, y, x_test, y_test = df_import('ex1data1.csv') #Dataset Linear 1
+    #x, y, x_test, y_test = df_import('ex1data2.csv') #Dataset Linear 2
+    x, y, x_test, y_test = df_import('ex2data1.csv') #Dataset Gaussiano
+    #x, y, x_test, y_test = df_import('ex2data2.csv') #Dataset Polinomial
+
     c = 10
     tol = 1 * 10^-4
     max_passes = 2
@@ -160,7 +165,6 @@ def svm():
     b = calc_b(idx, alfas_idx, y_idx, x_idx)
 
     size = len(x_test)
-    reshape_size = len(x_idx)
     predictions = []
     for i in range(size):
         res = np.multiply(y_idx, alfas_idx).T * K(x_idx, x_test[i])
@@ -175,8 +179,6 @@ def svm():
     print('Accuracy:', accuracy)
 
     plot(x,y,x_idx,y_idx, b, alfas_idx, x_test, y_test)
-
-    return 0
 
 #####################################################################
 def K(X, x):
@@ -285,7 +287,7 @@ def SMO(c, tol, max_passes, x, y):
 
     b = 0
     passes = 0
-    max_it = 5
+    max_it = 100
     it = 0
 
     while(passes < max_passes and it < max_it): #Ciclo While exterior
@@ -349,6 +351,7 @@ def SMO(c, tol, max_passes, x, y):
         #print(num_changed_alfas)
         if num_changed_alfas == 0:
             passes += 1
+            print(passes)
         else:
             passses = 0
 
